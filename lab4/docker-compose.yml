@@ -1,0 +1,22 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: library_mongo_lab4
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_lab4:/data/db
+
+  api:
+    build: .
+    container_name: library_api_lab4
+    depends_on:
+      - mongo
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - DATABASE_NAME=library_db
+
+volumes:
+  mongo_data_lab4:

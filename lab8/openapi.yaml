@@ -1,0 +1,160 @@
+openapi: 3.0.3
+info:
+  title: Library Mock API
+  version: 1.0.0
+  description: Mock API for library using Prism
+
+servers:
+  - url: http://localhost:4010
+
+paths:
+  /books:
+    get:
+      tags:
+        - Books
+      summary: Get all books
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [available, borrowed]
+        - name: author
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 0
+      responses:
+        "200":
+          description: List of books
+          content:
+            application/json:
+              example:
+                - id: "550e8400-e29b-41d4-a716-446655440000"
+                  title: "Кобзар"
+                  author: "Тарас Шевченко"
+                  description: "Збірка поезій"
+                  status: "available"
+                  year: 1840
+
+    post:
+      tags:
+        - Books
+      summary: Create a new book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookCreate"
+            example:
+              title: "Кобзар"
+              author: "Тарас Шевченко"
+              description: "Збірка поезій"
+              status: "available"
+              year: 1840
+      responses:
+        "201":
+          description: Book created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                title: "Кобзар"
+                author: "Тарас Шевченко"
+                description: "Збірка поезій"
+                status: "available"
+                year: 1840
+
+  /books/{book_id}:
+    get:
+      tags:
+        - Books
+      summary: Get book by ID
+      parameters:
+        - name: book_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Book found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                title: "Кобзар"
+                author: "Тарас Шевченко"
+                description: "Збірка поезій"
+                status: "available"
+                year: 1840
+        "404":
+          description: Book not found
+          content:
+            application/json:
+              example:
+                detail: "Book not found"
+
+    delete:
+      tags:
+        - Books
+      summary: Delete book by ID
+      parameters:
+        - name: book_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: Book deleted
+
+components:
+  schemas:
+    BookCreate:
+      type: object
+      required:
+        - title
+        - author
+        - status
+        - year
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [available, borrowed]
+        year:
+          type: integer
+
+    Book:
+      allOf:
+        - $ref: "#/components/schemas/BookCreate"
+        - type: object
+          properties:
+            id:
+              type: string
